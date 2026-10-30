@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: opis
+      POSTGRES_USER: opis
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opis_local_only}
+    volumes:
+      - opis_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opis -d opis"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      OPIS_DATABASE_URL: postgresql+psycopg://opis:${POSTGRES_PASSWORD:-opis_local_only}@db:5432/opis
+      OPIS_DEMO_DATA: ${OPIS_DEMO_DATA:-true}
+      OPIS_SCHEDULER_ENABLED: "true"
+      OPIS_ALLOW_PRIVATE_TARGETS: ${OPIS_ALLOW_PRIVATE_TARGETS:-false}
+      OPIS_CHECK_CONCURRENCY: ${OPIS_CHECK_CONCURRENCY:-10}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  test-db:
+    image: postgres:16-alpine
+    profiles: ["test"]
+    environment:
+      POSTGRES_DB: opis_test
+      POSTGRES_USER: opis_test
+      POSTGRES_PASSWORD: opis_test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opis_test -d opis_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  tests:
+    build: .
+    profiles: ["test"]
+    environment:
+      OPIS_TEST_DATABASE_URL: postgresql+psycopg://opis_test:opis_test@test-db:5432/opis_test
+    command: ["python", "-m", "pytest", "-q"]
+    depends_on:
+      test-db:
+        condition: service_healthy
+
+volumes:
+  opis_db:

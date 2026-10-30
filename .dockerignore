@@ -1,0 +1,15 @@
+.git
+.env
+.venv
+__pycache__
+.pytest_cache
+*.pyc
+*.db
+*.db-*
+*.sqlite*
+*.log
+*.zip
+.coverage
+coverage
+node_modules
+tests_ui

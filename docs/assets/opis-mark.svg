@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">Opis</title>
+  <rect width="96" height="96" rx="26" fill="#18382a"/>
+  <path d="M17 52h14l8-19 12 32 9-22 6 9h13" fill="none" stroke="#c5f5d1" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="74" cy="25" r="5.3" fill="#bdf3ca"/>
+</svg>
